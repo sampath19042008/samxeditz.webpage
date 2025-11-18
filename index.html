@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Samxeditz - Login</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+<body>
+    <div class="container">
+        <!-- Login Form -->
+        <div class="form-container active" id="loginForm">
+            <div class="form-box">
+                <h1>Samxeditz</h1>
+                <h2>Login</h2>
+                <form id="loginFormElement" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <label for="loginUsername">Username</label>
+                        <input type="text" id="loginUsername" placeholder="Enter your username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="loginPassword">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="loginPassword" placeholder="Enter your password" required>
+                            <button type="button" class="toggle-btn" onclick="togglePassword('loginPassword')">👁️</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Login</button>
+                </form>
+                <div id="loginMessage" class="message"></div>
+                <p class="toggle-text">Don't have an account? <a href="#" onclick="switchToSignup()">Sign Up</a></p>
+            </div>
+        </div>
+
+        <!-- Signup Form -->
+        <div class="form-container" id="signupForm">
+            <div class="form-box">
+                <h1>Samxeditz</h1>
+                <h2>Sign Up</h2>
+                <form id="signupFormElement" onsubmit="handleSignup(event)">
+                    <div class="input-group">
+                        <label for="signupUsername">Username</label>
+                        <input type="text" id="signupUsername" placeholder="Choose a username" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signupEmail">Email</label>
+                        <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="signupPassword">Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="signupPassword" placeholder="Create a password" required>
+                            <button type="button" class="toggle-btn" onclick="togglePassword('signupPassword')">👁️</button>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label for="confirmPassword">Confirm Password</label>
+                        <div class="password-wrapper">
+                            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                            <button type="button" class="toggle-btn" onclick="togglePassword('confirmPassword')">👁️</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-submit">Sign Up</button>
+                </form>
+                <div id="signupMessage" class="message"></div>
+                <div class="divider"><span>Or</span></div>
+                <div id="google_signin_button" class="google-signin-container"></div>
+                <p class="toggle-text">Already have an account? <a href="#" onclick="switchToLogin()">Login</a></p>
+            </div>
+        </div>
+
+        <!-- Email Verification Form -->
+        <div class="form-container" id="verificationForm">
+            <div class="form-box">
+                <h1>Samxeditz</h1>
+                <h2>Verify Email</h2>
+                <p class="verify-text">A verification code has been sent to <strong id="verifyEmail"></strong></p>
+                <form id="verificationFormElement" onsubmit="handleVerification(event)">
+                    <div class="input-group">
+                        <label for="verificationCode">Enter 6-digit Code</label>
+                        <input type="text" id="verificationCode" placeholder="000000" maxlength="6" required>
+                    </div>
+                    <button type="submit" class="btn-submit">Verify</button>
+                </form>
+                <div id="verificationMessage" class="message"></div>
+                <p class="toggle-text"><a href="#" onclick="resendCode()">Resend Code</a> | <a href="#" onclick="switchToSignup()">Change Email</a></p>
+            </div>
+        </div>
+
+        <!-- Dashboard -->
+        <div class="form-container" id="dashboard">
+            <div class="dashboard-wrapper">
+                <!-- Sidebar Navigation -->
+                <nav class="dashboard-sidebar">
+                    <div class="sidebar-header">
+                        <h3>Samxeditz</h3>
+                    </div>
+                    <ul class="nav-menu">
+                        <li><a href="#" onclick="showDashboardSection('home')" class="nav-item active">🏠 Home</a></li>
+                        <li><a href="#" onclick="showDashboardSection('profile')" class="nav-item">👤 Profile</a></li>
+                        <li><a href="#" onclick="showDashboardSection('messages')" class="nav-item">💬 Messages</a></li>
+                        <li><a href="#" onclick="showDashboardSection('files')" class="nav-item">📁 Files</a></li>
+                        <li><a href="#" onclick="showDashboardSection('integrations')" class="nav-item">🔗 Integrations</a></li>
+                        <li><a href="#" onclick="showDashboardSection('settings')" class="nav-item">⚙️ Settings</a></li>
+                    </ul>
+                    <button class="btn-logout-sidebar" onclick="handleLogout()">🚪 Logout</button>
+                </nav>
+
+                <!-- Main Content -->
+                <div class="dashboard-main">
+                    <!-- Header with Theme Toggle -->
+                    <div class="dashboard-header">
+                        <div>
+                            <h1>Welcome, <span id="dashboardUsername"></span>!</h1>
+                            <p class="header-subtitle">Manage your account here</p>
+                        </div>
+                        <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+                            <span class="theme-icon">🌙</span>
+                        </button>
+                    </div>
+
+                    <!-- Home Section -->
+                    <div class="dashboard-section active" id="section-home">
+                        <div class="section-content">
+                            <h2>Dashboard Overview</h2>
+                            <div class="dashboard-stats">
+                                <div class="stat-card">
+                                    <div class="stat-icon">📧</div>
+                                    <h3>Email</h3>
+                                    <p id="dashboardEmail"></p>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon">✅</div>
+                                    <h3>Status</h3>
+                                    <p>Verified</p>
+                                </div>
+                                <div class="stat-card">
+                                    <div class="stat-icon">⭐</div>
+                                    <h3>Access</h3>
+                                    <p>Full</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Section -->
+                    <div class="dashboard-section" id="section-profile">
+                        <div class="section-content">
+                            <h2>Your Profile</h2>
+                            <div class="profile-card">
+                                <div class="profile-avatar" id="avatarCircle">
+                                    <span id="avatarInitial"></span>
+                                </div>
+                                <div class="profile-details">
+                                    <div class="detail-row">
+                                        <label>Username</label>
+                                        <p id="profileUsername"></p>
+                                    </div>
+                                    <div class="detail-row">
+                                        <label>Email</label>
+                                        <p id="profileEmail"></p>
+                                    </div>
+                                    <div class="detail-row">
+                                        <label>Status</label>
+                                        <p><span class="badge">✅ Verified</span></p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Section -->
+                    <div class="dashboard-section" id="section-messages">
+                        <div class="section-content">
+                            <h2>Messages & Notifications</h2>
+                            <div class="messages-container">
+                                <div class="no-messages">
+                                    <div style="font-size: 48px; margin-bottom: 15px;">💬</div>
+                                    <p>No messages yet</p>
+                                    <small>Start a conversation by connecting with other users</small>
+                                </div>
+                                <div class="message-features" style="margin-top: 30px;">
+                                    <h3>Features Coming Soon:</h3>
+                                    <ul style="list-style: none; padding: 0;">
+                                        <li>✓ Direct messaging</li>
+                                        <li>✓ Read receipts</li>
+                                        <li>✓ Message search</li>
+                                        <li>✓ Notification preferences</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Files Section -->
+                    <div class="dashboard-section" id="section-files">
+                        <div class="section-content">
+                            <h2>File Management</h2>
+                            <div class="files-container">
+                                <div class="file-upload-area">
+                                    <input type="file" id="fileInput" style="display: none;" onchange="handleFileUpload(event)">
+                                    <button class="btn-upload" onclick="document.getElementById('fileInput').click()">
+                                        <div style="font-size: 32px; margin-bottom: 10px;">📤</div>
+                                        <div>Upload File</div>
+                                        <small>Drag and drop or click</small>
+                                    </button>
+                                </div>
+                                <div class="file-list" id="fileList">
+                                    <div class="no-files">
+                                        <p>No files uploaded yet</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="storage-info">
+                                <h4>Storage Usage</h4>
+                                <div class="storage-bar">
+                                    <div class="storage-used" style="width: 0%"></div>
+                                </div>
+                                <p><span id="storageUsed">0</span> MB / 100 MB</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integrations Section -->
+                    <div class="dashboard-section" id="section-integrations">
+                        <div class="section-content">
+                            <h2>Integrations & Social</h2>
+                            <div class="integrations-grid">
+                                <div class="integration-card">
+                                    <div class="integration-icon" style="background: #4285F4;">
+                                        <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z'/%3E%3Cpath d='M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z'/%3E%3Cpath d='M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z'/%3E%3Cpath d='M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z'/%3E%3C/svg%3E" alt="Google" style="width: 30px; height: 30px;">
+                                    </div>
+                                    <h3>Google</h3>
+                                    <p>Connect your Google account</p>
+                                    <button class="btn-integrate" onclick="alert('Google login coming soon!')">Connect</button>
+                                </div>
+
+                                <div class="integration-card">
+                                    <div class="integration-icon" style="background: #333;">
+                                        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' style="width: 30px; height: 30px;">
+                                            <path d='M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v 3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z'/>
+                                        </svg>
+                                    </div>
+                                    <h3>GitHub</h3>
+                                    <p>Link your GitHub profile</p>
+                                    <button class="btn-integrate" onclick="alert('GitHub integration coming soon!')">Connect</button>
+                                </div>
+
+                                <div class="integration-card">
+                                    <div class="integration-icon" style="background: #1DA1F2;">
+                                        <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white' style="width: 30px; height: 30px;">
+                                            <path d='M23 3a10.9 10.9 0 01-3.14 1.53 4.48 4.48 0 00-7.86 3v1A10.66 10.66 0 013 4s-4 9 5 13a11.64 11.64 0 01-7 2s9 5 20 5a9.5 9.5 0 00-9-5.5c4.75 2.25 7-7 7-7 1.44 1.58 2.46 3.06 2.41 4.5z'/>
+                                        </svg>
+                                    </div>
+                                    <h3>Twitter</h3>
+                                    <p>Share on Twitter</p>
+                                    <button class="btn-integrate" onclick="alert('Twitter integration coming soon!')">Connect</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Settings Section -->
+                    <div class="dashboard-section" id="section-settings">
+                        <div class="section-content">
+                            <h2>Settings</h2>
+                            
+                            <div class="settings-box">
+                                <h3>🌙 Appearance</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span>Dark Mode</span>
+                                    </div>
+                                    <label class="toggle-switch">
+                                        <input type="checkbox" id="darkModeToggle" onchange="toggleTheme()">
+                                        <span class="slider"></span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div class="settings-box">
+                                <h3>🔐 Account</h3>
+                                <div class="setting-item">
+                                    <div class="setting-info">
+                                        <span>Email Address</span>
+                                        <small id="settingsEmail"></small>
+                                    </div>
+                                </div>
+                                <button class="btn-setting" onclick="alert('Coming soon!')">Change Password</button>
+                            </div>
+
+                            <div class="settings-box danger">
+                                <h3>🚪 Logout</h3>
+                                <button class="btn-logout-settings" onclick="handleLogout()">Logout from Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:5000/api';
+
+        // Dark Mode Management
+        function initDarkMode() {
+            const isDark = localStorage.getItem('darkMode') === 'true';
+            if (isDark) {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').checked = true;
+            }
+        }
+
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDark);
+            document.getElementById('darkModeToggle').checked = isDark;
+        }
+
+        // Show Dashboard Section
+        function showDashboardSection(section) {
+            // Hide all sections
+            document.querySelectorAll('.dashboard-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Remove active from nav items
+            document.querySelectorAll('.nav-item').forEach(el => {
+                el.classList.remove('active');
+            });
+            // Show selected section
+            document.getElementById(`section-${section}`).classList.add('active');
+            // Add active to nav item
+            event.target.classList.add('active');
+        }
+
+        // Toggle password visibility
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            field.type = field.type === 'password' ? 'text' : 'password';
+        }
+
+        // Switch to signup
+        function switchToSignup() {
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('signupForm').classList.add('active');
+        }
+
+        // Switch to login
+        function switchToLogin() {
+            document.getElementById('signupForm').classList.remove('active');
+            document.getElementById('verificationForm').classList.remove('active');
+            document.getElementById('loginForm').classList.add('active');
+        }
+
+        // Handle Login
+        async function handleLogin(e) {
+            e.preventDefault();
+            const username = document.getElementById('loginUsername').value;
+            const password = document.getElementById('loginPassword').value;
+            const msgEl = document.getElementById('loginMessage');
+
+            try {
+                const response = await fetch(`${API_URL}/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('user', JSON.stringify(data.user));
+                    localStorage.setItem('token', data.token);
+                    showDashboard();
+                    msgEl.textContent = '';
+                } else {
+                    msgEl.textContent = '❌ ' + data.message;
+                    msgEl.style.color = '#ff4757';
+                }
+            } catch (err) {
+                msgEl.textContent = '❌ Error: ' + err.message;
+                msgEl.style.color = '#ff4757';
+            }
+        }
+
+        // Handle Signup
+        async function handleSignup(e) {
+            e.preventDefault();
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const msgEl = document.getElementById('signupMessage');
+
+            if (password !== confirmPassword) {
+                msgEl.textContent = '❌ Passwords do not match';
+                msgEl.style.color = '#ff4757';
+                return;
+            }
+
+            if (password.length < 6) {
+                msgEl.textContent = '❌ Password must be at least 6 characters';
+                msgEl.style.color = '#ff4757';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/signup`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, email, password })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    localStorage.setItem('pendingEmail', email);
+                    localStorage.setItem('pendingUsername', username);
+                    showVerification(email);
+                    msgEl.textContent = '';
+                } else {
+                    msgEl.textContent = '❌ ' + data.message;
+                    msgEl.style.color = '#ff4757';
+                }
+            } catch (err) {
+                msgEl.textContent = '❌ Error: ' + err.message;
+                msgEl.style.color = '#ff4757';
+            }
+        }
+
+        // Show verification form
+        function showVerification(email) {
+            document.getElementById('signupForm').classList.remove('active');
+            document.getElementById('verificationForm').classList.add('active');
+            document.getElementById('verifyEmail').textContent = email;
+        }
+
+        // Handle verification
+        async function handleVerification(e) {
+            e.preventDefault();
+            const code = document.getElementById('verificationCode').value;
+            const email = localStorage.getItem('pendingEmail');
+            const msgEl = document.getElementById('verificationMessage');
+
+            try {
+                const response = await fetch(`${API_URL}/verify-email`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, code })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    msgEl.textContent = '✅ Email verified! You can now login.';
+                    msgEl.style.color = '#2ecc71';
+                    setTimeout(() => switchToLogin(), 2000);
+                    localStorage.removeItem('pendingEmail');
+                    localStorage.removeItem('pendingUsername');
+                } else {
+                    msgEl.textContent = '❌ ' + data.message;
+                    msgEl.style.color = '#ff4757';
+                }
+            } catch (err) {
+                msgEl.textContent = '❌ Error: ' + err.message;
+                msgEl.style.color = '#ff4757';
+            }
+        }
+
+        // Resend code
+        async function resendCode() {
+            const email = localStorage.getItem('pendingEmail');
+            const msgEl = document.getElementById('verificationMessage');
+
+            try {
+                const response = await fetch(`${API_URL}/resend-code`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+
+                const data = await response.json();
+                msgEl.textContent = data.success ? '✅ ' + data.message : '❌ ' + data.message;
+                msgEl.style.color = data.success ? '#2ecc71' : '#ff4757';
+            } catch (err) {
+                msgEl.textContent = '❌ Error: ' + err.message;
+                msgEl.style.color = '#ff4757';
+            }
+        }
+
+        // Show dashboard
+        function showDashboard() {
+            const user = JSON.parse(localStorage.getItem('user'));
+            document.getElementById('loginForm').classList.remove('active');
+            document.getElementById('verificationForm').classList.remove('active');
+            document.getElementById('signupForm').classList.remove('active');
+            document.getElementById('dashboard').classList.add('active');
+            
+            // Set user info
+            document.getElementById('dashboardUsername').textContent = user.username;
+            document.getElementById('dashboardEmail').textContent = user.email;
+            document.getElementById('profileUsername').textContent = user.username;
+            document.getElementById('profileEmail').textContent = user.email;
+            document.getElementById('settingsEmail').textContent = user.email;
+            document.getElementById('avatarInitial').textContent = user.username.charAt(0).toUpperCase();
+            document.getElementById('avatarCircle').style.backgroundColor = getColorFromUsername(user.username);
+            
+            // Show home section by default
+            document.getElementById('section-home').classList.add('active');
+        }
+
+        // Get color from username
+        function getColorFromUsername(username) {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#00f2fe'];
+            let hash = 0;
+            for (let i = 0; i < username.length; i++) {
+                hash = username.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return colors[Math.abs(hash) % colors.length];
+        }
+
+        // File Management
+        let uploadedFiles = JSON.parse(localStorage.getItem('uploadedFiles')) || [];
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const fileSize = (file.size / 1024 / 1024).toFixed(2); // Convert to MB
+            const currentUsage = uploadedFiles.reduce((sum, f) => sum + parseFloat(f.size), 0);
+            
+            if (currentUsage + parseFloat(fileSize) > 100) {
+                alert('Storage limit exceeded! You have 100 MB total.');
+                return;
+            }
+
+            const fileObj = {
+                name: file.name,
+                size: fileSize,
+                type: file.type,
+                date: new Date().toLocaleDateString()
+            };
+
+            uploadedFiles.push(fileObj);
+            localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+            refreshFileList();
+            alert(`✅ File "${file.name}" uploaded successfully!`);
+        }
+
+        function refreshFileList() {
+            const fileList = document.getElementById('fileList');
+            if (uploadedFiles.length === 0) {
+                fileList.innerHTML = '<div class="no-files"><p>No files uploaded yet</p></div>';
+                document.getElementById('storageUsed').textContent = '0';
+                return;
+            }
+
+            let html = '<div class="files-grid">';
+            let totalSize = 0;
+            
+            uploadedFiles.forEach((file, index) => {
+                totalSize += parseFloat(file.size);
+                html += `
+                    <div class="file-item">
+                        <div class="file-icon">📄</div>
+                        <div class="file-info">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-meta">${file.size} MB • ${file.date}</div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteFile(${index})">🗑️</button>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            fileList.innerHTML = html;
+            document.getElementById('storageUsed').textContent = totalSize.toFixed(2);
+        }
+
+        function deleteFile(index) {
+            if (confirm('Delete this file?')) {
+                uploadedFiles.splice(index, 1);
+                localStorage.setItem('uploadedFiles', JSON.stringify(uploadedFiles));
+                refreshFileList();
+            }
+        }
+
+        // Handle logout
+        function handleLogout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            document.getElementById('dashboard').classList.remove('active');
+            document.getElementById('loginForm').classList.add('active');
+            document.getElementById('loginFormElement').reset();
+        }
+
+        // Check if already logged in
+        window.addEventListener('load', () => {
+            initDarkMode();
+            const user = localStorage.getItem('user');
+            if (user) {
+                showDashboard();
+            }
+            
+            // Initialize Google Sign-In
+            initGoogleSignIn();
+        });
+
+        // Initialize Google Sign-In
+        function initGoogleSignIn() {
+            try {
+                google.accounts.id.initialize({
+                    client_id: '404468924128-2002kek8v1jvo2nfnb6ah83fp26d7chi.apps.googleusercontent.com',
+                    callback: handleGoogleSignIn
+                });
+                
+                google.accounts.id.renderButton(
+                    document.getElementById('google_signin_button'),
+                    { 
+                        theme: 'outline', 
+                        size: 'large',
+                        width: '320'
+                    }
+                );
+            } catch (err) {
+                console.log('Google Sign-In not ready yet');
+            }
+        }
+
+        // Show signup messages (success or error)
+        function showSignupMessage(text, success) {
+            const el = document.getElementById('signupMessage');
+            if (!el) return;
+            el.textContent = text;
+            el.style.color = success ? '#2ecc71' : '#ff4757';
+        }
+
+        // Handle Google Sign-In response
+        async function handleGoogleSignIn(response) {
+            try {
+                console.log('Google response:', response);
+
+                if (!response || !response.credential) {
+                    console.error('No credential in Google response', response);
+                    showSignupMessage('❌ Google did not return credentials. Check popup or browser console.', false);
+                    return;
+                }
+
+                const decodedToken = parseJwt(response.credential);
+                console.log('Decoded Google token:', decodedToken);
+
+                const email = decodedToken.email;
+                const name = decodedToken.name || decodedToken.email.split('@')[0];
+
+                if (!email) {
+                    showSignupMessage('❌ Google token missing email claim.', false);
+                    return;
+                }
+
+                // Call backend to register/login with Google
+                const result = await fetch('http://localhost:5000/api/google-auth', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        name: name,
+                        googleId: decodedToken.sub
+                    })
+                });
+
+                if (!result.ok) {
+                    const text = await result.text();
+                    console.error('Backend error:', result.status, text);
+                    showSignupMessage(`❌ Server error: ${result.status}`, false);
+                    return;
+                }
+
+                const data = await result.json();
+                console.log('/api/google-auth response:', data);
+
+                if (data.success) {
+                    // Store user info
+                    localStorage.setItem('user', JSON.stringify({
+                        username: name.split(' ')[0],
+                        email: email,
+                        verified: true,
+                        authMethod: 'google'
+                    }));
+                    localStorage.setItem('token', data.token);
+
+                    showSignupMessage('✅ Logged in successfully with Google!', true);
+                    setTimeout(() => {
+                        showDashboard();
+                    }, 800);
+                } else {
+                    console.warn('Auth failed:', data.message);
+                    showSignupMessage('❌ ' + data.message, false);
+                }
+            } catch (error) {
+                console.error('Google Sign-In error:', error);
+                showSignupMessage('❌ Google authentication failed: ' + (error.message || error), false);
+            }
+        }
+
+        // Parse JWT token
+        function parseJwt(token) {
+            const base64Url = token.split('.')[1];
+            const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            const jsonPayload = decodeURIComponent(atob(base64).split('').map((c) => {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join(''));
+            return JSON.parse(jsonPayload);
+        }
+    </script>
+</body>
+</html>
